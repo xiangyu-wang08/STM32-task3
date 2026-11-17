@@ -5,5 +5,6 @@ void PWM_Init(void);
 void PWM_SetCompare1(uint16_t Compare);
 void PWM_SetPrescaler(uint16_t Prescaler);
 void PWM_Setf(uint32_t f);
+void PWM_SetDutyPercent(uint32_t percent);
 
 #endif

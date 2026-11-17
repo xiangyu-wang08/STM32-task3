@@ -37,13 +37,16 @@ int main(void)
 	OLED_ShowString(3,1,"Mode:1");
 	
 	PWM_Setf(100);			//默认频率100Hz
-	PWM_SetCompare1 (10);             //默认占空比10%
+	PWM_SetDutyPercent (10);             //默认占空比10%
 	
 	while (1)
 	{
+
 		key=Key_GetNum();
 		if (key  ==1)			//按下按键    
 		{
+		
+			
 			if (mode ==1)    		//切换到ETR测频模式
 			{
 				mode =2;
@@ -79,7 +82,7 @@ int main(void)
 				Serial_RxPacket[strlen(Serial_RxPacket)-1] = '\0';
 				
 				zkb = atoi(Serial_RxPacket);
-				PWM_SetCompare1(zkb);
+				PWM_SetDutyPercent(zkb);
 				
 			}
 
