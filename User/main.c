@@ -117,6 +117,24 @@ int main(void)
 				PWM_SetDutyPercent(zkb);
 				
 			}
+			else if (Serial_RxPacket[0]=='h')				//切换ADC配合DMA开启高速采样转运
+			{
+				TIM_Cmd(TIM1 , DISABLE);
+				AD_DMACapture_Init(256);
+				uint16_t n = 256;
+				for (uint16_t i =0 ; i<n;i++)
+				{
+					Serial_printf("%d\n", AD_DMAValue[i]);
+				}
+				
+				
+			}
+			else if (Serial_RxPacket[0]=='l')					//返回ADC实时采样
+			{
+				DMA_Cmd(DMA1_Channel1, DISABLE);
+				ADC_DMACmd(ADC1 , DISABLE);
+				TIM_Cmd(TIM1 , ENABLE);
+			}
 
 			Serial_RxFlag=0;
 		}

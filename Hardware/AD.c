@@ -1,12 +1,12 @@
 #include "stm32f10x.h"                  // Device header
 
-//uint16_t AD_Value[4];
+uint16_t AD_DMAValue[500];
 
 void AD_Init(void)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);	
+		
 	
 	RCC_ADCCLKConfig(RCC_PCLK2_Div6);
 	
@@ -29,25 +29,7 @@ void AD_Init(void)
 	ADC_Init(ADC1,&ADC_InitStructure);
 	
 
-//	
-//	DMA_InitTypeDef DMA_InitStructure;
-//	DMA_InitStructure.DMA_PeripheralBaseAddr =(uint32_t)&ADC1->DR ;
-//	DMA_InitStructure.DMA_PeripheralDataSize =DMA_PeripheralDataSize_HalfWord ;
-//	DMA_InitStructure.DMA_PeripheralInc =DMA_PeripheralInc_Disable ;	
-//	DMA_InitStructure.DMA_MemoryBaseAddr =(uint32_t)AD_Value ;
-//	DMA_InitStructure.DMA_MemoryDataSize =DMA_MemoryDataSize_HalfWord ;
-//	DMA_InitStructure.DMA_MemoryInc =DMA_MemoryInc_Enable ;	
-//	DMA_InitStructure.DMA_DIR =DMA_DIR_PeripheralSRC ;
-//	DMA_InitStructure.DMA_BufferSize = 4;
-//	DMA_InitStructure.DMA_Mode =DMA_Mode_Circular ;
-//	DMA_InitStructure.DMA_M2M =DMA_M2M_Disable ;
-//	DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;
-//	
-//	DMA_Init(DMA1_Channel1,&DMA_InitStructure);
-//	
-//	DMA_Cmd(DMA1_Channel1, ENABLE);
-//	
-//	ADC_DMACmd(ADC1 , ENABLE);
+
 	
 	ADC_Cmd(ADC1,ENABLE);
 	
@@ -72,16 +54,34 @@ uint16_t AD_GetValue(void)
 }
 
 
+void AD_DMACapture_Init ( uint16_t num)
+{
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+	
+	DMA_InitTypeDef DMA_InitStructure;
+	DMA_InitStructure.DMA_PeripheralBaseAddr =(uint32_t) &ADC1 ->DR ;
+	DMA_InitStructure.DMA_PeripheralDataSize =DMA_PeripheralDataSize_HalfWord ;
+	DMA_InitStructure.DMA_PeripheralInc =DMA_PeripheralInc_Disable ;	
+	DMA_InitStructure.DMA_MemoryBaseAddr =(uint32_t)AD_DMAValue ;
+	DMA_InitStructure.DMA_MemoryDataSize =DMA_MemoryDataSize_HalfWord ;
+	DMA_InitStructure.DMA_MemoryInc =DMA_MemoryInc_Enable ;	
+	DMA_InitStructure.DMA_DIR =DMA_DIR_PeripheralSRC ;
+	DMA_InitStructure.DMA_BufferSize = num;
+	DMA_InitStructure.DMA_Mode =DMA_Mode_Normal;
+	DMA_InitStructure.DMA_M2M =DMA_M2M_Disable ;
+	DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;
+	
+	DMA_Init(DMA1_Channel1,&DMA_InitStructure);
+	DMA_ClearFlag(DMA1_FLAG_TC1);
+	
+	DMA_Cmd(DMA1_Channel1, ENABLE);
+	
+	ADC_DMACmd(ADC1 , ENABLE);
+	while (DMA_GetFlagStatus(DMA1_FLAG_TC1) == RESET);
+	
+	ADC_DMACmd(ADC1 , DISABLE);
+	DMA_Cmd(DMA1_Channel1 , DISABLE);
+	
+}
 
-//void AD_GetValue(void)
-//{
-//	DMA_Cmd(DMA1_Channel1, DISABLE);
-//	DMA_SetCurrDataCounter(DMA1_Channel1 , 4);
-//	DMA_Cmd(DMA1_Channel1, ENABLE);
-//	
-//	ADC_SoftwareStartConvCmd(ADC1,ENABLE);
-//	
-//	while (DMA_GetFlagStatus(DMA1_FLAG_TC1) == RESET);
-//	DMA_ClearFlag(DMA1_FLAG_TC1);
-//}
 
