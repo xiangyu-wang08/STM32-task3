@@ -58,7 +58,7 @@ uint32_t IC_GetFreq(void)
 
 uint32_t IC_GetDuty(void)
 {
-	return (TIM_GetCapture2(TIM2)+1)*100/(TIM_GetCapture1(TIM2)+1);
+	return (TIM_GetCapture2(TIM2))*100/(TIM_GetCapture1(TIM2));
 
 }
 

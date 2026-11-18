@@ -25,7 +25,7 @@ void Serial_Init(void)
 	GPIO_Init(GPIOA,&GPIO_InitStructure);
 	
 	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_BaudRate= 9600 ;
+	USART_InitStructure.USART_BaudRate= 115200 ;
 	USART_InitStructure.USART_HardwareFlowControl= USART_HardwareFlowControl_None ;
 	USART_InitStructure.USART_Mode= USART_Mode_Tx | USART_Mode_Rx ;
 	USART_InitStructure.USART_Parity = USART_Parity_No ;
@@ -127,7 +127,7 @@ void USART1_IRQHandler(void)
 {
 	static uint8_t RxState =0;
 	static uint8_t pRxPacket =0;
-	if(USART_GetFlagStatus(USART1,USART_IT_RXNE) == SET )
+	if(USART_GetFlagStatus(USART1,USART_FLAG_RXNE) == SET )
 	{
 		uint8_t RxData = USART_ReceiveData(USART1);
 		

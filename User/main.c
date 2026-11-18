@@ -10,6 +10,7 @@
 #include "ETR.h"
 #include "Timer.h"
 #include "Key.h"
+#include "AD.h"
 
 
 int f;
@@ -18,6 +19,9 @@ int ETRf;
 int cnt;
 uint8_t key;
 uint8_t mode;
+volatile uint16_t ADValue[128];
+volatile uint16_t ReadIndex;
+volatile uint16_t WriteIndex;
 
 int main(void)
 {
@@ -27,6 +31,11 @@ int main(void)
 	Serial_Init();				  
 	IC_Init();         				//模式1   输入捕获测周模式    （默认模式）
 	mode = 1;
+	AD_Init(); 							//默认AD实时采样模式
+	
+	
+	TIM1_Init();
+	
 	
 //	ETR_Init();						//模式2     ETR测频模式
 //	Timer_Init();
@@ -41,7 +50,29 @@ int main(void)
 	
 	while (1)
 	{
+		
+		
+		
+		
+		while (ReadIndex != WriteIndex )
+		{			
+			Serial_printf("%d\n", ADValue[ReadIndex]);
+			ReadIndex = (ReadIndex +1) %128;
+		}
 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		key=Key_GetNum();
 		if (key  ==1)			//按下按键    
 		{
@@ -77,9 +108,10 @@ int main(void)
 				f = atoi (Serial_RxPacket+1);
 				PWM_Setf(f);
 			}
-			else if (Serial_RxPacket[strlen(Serial_RxPacket)-1] =='%'   )			//调整占空比
+			else if (  strlen(Serial_RxPacket)>0   &&     Serial_RxPacket[strlen(Serial_RxPacket)-1] =='%'   )			//调整占空比
 			{
 				Serial_RxPacket[strlen(Serial_RxPacket)-1] = '\0';
+				
 				
 				zkb = atoi(Serial_RxPacket);
 				PWM_SetDutyPercent(zkb);
@@ -131,4 +163,28 @@ void TIM4_IRQHandler(void)                              //定时100ms中断  测
 
 	TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
 }
+
+
+void TIM1_UP_IRQHandler(void)						//ADC定时1ms采样
+{
+	if (TIM_GetITStatus(TIM1,TIM_IT_Update) == SET)
+	{
+		TIM_ClearITPendingBit(TIM1,TIM_IT_Update);
+		if (ReadIndex == (WriteIndex+1)%128)
+		{
+		}
+		else 
+		{
+			ADValue[WriteIndex] = AD_GetValue();
+			WriteIndex =(WriteIndex+1) % 128;
+		}
+		
+		
+	
+	
+	
+	}
+
+}
+
 
